@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "../../dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.demo.backstage.dao.productDao">
+	<resultMap type="product" id="productMap">
+	<id column="id" property="id"/>
+		<result column="product_name" property="productName" />
+		<result column="parent_id" property="parentId" />
+		<result column="product_pagetype" property="productPageType" />
+		<result column="is_show" property="isShow" />
+		<result column="is_delete" property="isDelete" />
+		<result column="produnt_thumbnail" property="produntThumbnail" />
+	</resultMap>
+	
+	
+	<!-- 产品中心加载产品 -->
+	<select id="getProduct" parameterType="util" resultMap="productMap">
+		select * from backstage_product where is_delete='1' 
+		<choose>
+				<!-- Integer1  1:parentId is null , 2 parentId is not null -->			
+				<when test="integer1==1"> and parent_id is null </when>
+				<when test="integer1==2"> and parent_id is not null </when>
+		</choose>
+	</select>
+	<select id="getProductToPage" parameterType="util" resultMap="productMap">
+		select * from backstage_product where  is_delete='1'
+		<choose>
+				<!-- Integer1  1:parentId is null , 2 parentId is not null -->			
+				<when test="integer1==1"> and parent_id is null </when>
+				<when test="integer1==2"> and parent_id is not null </when>
+		</choose>
+		<if test="page!=null and rows!=null ">
+		 	limit #{page},#{rows}
+		</if>
+	</select>
+	
+	<!-- 产品中心加载产品 -->
+	<select id="getProductChild" parameterType="Integer" resultMap="productMap">
+		select * from backstage_product where parent_id=#{0} and is_delete='1'
+	</select>
+	<select id="getProductContent" parameterType="Integer" resultMap="productMap">
+		select * from backstage_product where id=#{0} and is_delete=1
+	</select>
+	<!-- 获取所有子类产品信息  -->
+	<select id="getProductChildList" parameterType="Integer" resultMap="productMap">
+		select * from backstage_product where parent_id is not null and is_delete='1'
+		limit #{page},#{rows}
+	</select>
+	
+</mapper>
